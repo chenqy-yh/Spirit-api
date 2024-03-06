@@ -8,7 +8,7 @@ export class OsController {
 
   @Get('grt')
   getServerCurrentRecievedAndTransmit(@Query('path') path: string) {
-    return fs.readFileSync(path, 'utf-8');
+    return this.osService.getServerNetwork();
   }
   @Get('info')
   async getServerInfo() {
