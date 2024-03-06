@@ -63,19 +63,26 @@ export class OsService {
 
   getServerNetwork() {
     const str = fs.readFileSync('/proc/net/dev', 'utf-8');
+    const total = [0, 0];
     const list = str
       .split('\n')
       .splice(2)
       .map((x) => {
         const rs = x.split(/\s+/);
-        if(!rs[0]) rs.shift();
-        if(!rs.length) return;        
+        if (!rs[0]) rs.shift();
+        if (!rs.length) return;
+        total[0] += +rs[1];
+        total[1] += +rs[9];
         return {
-          name: rs[0].slice(0,-1),
+          name: rs[0].slice(0, -1),
           downT: +rs[1],
           upT: +rs[9],
-        }
+        };
       });
-    return list.filter(x=>x);
+    return {
+      list: list.filter((x) => x),
+      downT: total[0],
+      upT: total[1],
+    };
   }
 }
