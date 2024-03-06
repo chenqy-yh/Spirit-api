@@ -10,12 +10,21 @@ dependencies:
   '@nestjs/platform-express':
     specifier: ^9.0.0
     version: 9.0.0(@nestjs/common@9.0.0)(@nestjs/core@9.0.0)
+  diskinfo:
+    specifier: ^0.0.3
+    version: 0.0.3
+  os-utils:
+    specifier: ^0.0.14
+    version: 0.0.14
   reflect-metadata:
     specifier: ^0.1.13
     version: 0.1.13
   rxjs:
     specifier: ^7.2.0
     version: 7.2.0
+  systeminformation:
+    specifier: ^5.22.0
+    version: 5.22.0
 
 devDependencies:
   '@nestjs/cli':
@@ -2179,6 +2188,11 @@ packages:
       path-type: 4.0.0
     dev: true
 
+  /diskinfo@0.0.3:
+    resolution: {integrity: sha512-uZoeIGLsRWBWX+P1K14R/JDvCpo4kdUd6p2jVh09dzsNog005gSYLF6GXjSqPKo6Tl9qsw2f6auy8UUcC2y6yg==}
+    os: [linux, win32]
+    dev: false
+
   /doctrine@3.0.0:
     resolution: {integrity: sha512-yS+Q5i3hBf7GBkd4KG8a7eBNNWNGLTaEwwYWUijIYM7zrlYDM0BFXHjjPWlWZ1Rg7UaddZeIDmi9jF3HmqiQ2w==}
     engines: {node: '>=6.0.0'}
@@ -3902,6 +3916,10 @@ packages:
     engines: {node: '>=0.10.0'}
     dev: true
 
+  /os-utils@0.0.14:
+    resolution: {integrity: sha512-ajB8csaHLBvJOYsHJkp8YdO2FvlBbf/ZxaYQwXXRDyQ84UoE+uTuLXxqd0shekXMX6Qr/pt/DDyLMRAMsgfWzg==}
+    dev: false
+
   /p-limit@2.3.0:
     resolution: {integrity: sha512-//88mFWSJx8lxCzwdAABTJL2MyWB12+eIY7MDL2SqLmAkeKU9qxRvWuSyTjm3FUmpBEMuFfckAIqEaVGUDxb6w==}
     engines: {node: '>=6'}
@@ -4538,6 +4556,13 @@ packages:
     resolution: {integrity: sha512-b19dMThMV4HVFynSAM1++gBHAbk2Tc/osgLIBZMKsyqh34jb2e8Os7T6ZW/Bt3pJFdBTd2JwAnAAEQV7rSNvcQ==}
     engines: {node: '>=0.10'}
     dev: true
+
+  /systeminformation@5.22.0:
+    resolution: {integrity: sha512-oAP80ymt8ssrAzjX8k3frbL7ys6AotqC35oikG6/SG15wBw+tG9nCk4oPaXIhEaAOAZ8XngxUv3ORq2IuR3r4Q==}
+    engines: {node: '>=8.0.0'}
+    os: [darwin, linux, win32, freebsd, openbsd, netbsd, sunos, android]
+    hasBin: true
+    dev: false
 
   /tapable@2.2.1:
     resolution: {integrity: sha512-GNzQvQTOIP6RyTfE2Qxb8ZVlNmw0n88vp1szwWRimP02mnTsx3Wtn5qRdqY9w2XduFNUgvOwhNnQsjwCp+kqaQ==}
