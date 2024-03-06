@@ -54,7 +54,22 @@ export class OsService {
     return di.getDiskInfo();
   }
 
+  // "upTotal": 506490584,
+  // "downTotal": 405200998,
+  // "up": 0.97,
+  // "down": 1.73,
+  // "downPackets": 953271,
+  // "upPackets": 991508,
+
   getServerNetwork() {
-    return fs.readFileSync('/proc/net/dev', 'utf-8');
+    const str = fs.readFileSync('/proc/net/dev', 'utf-8');
+    const list = str
+      .split('\n')
+      .splice(2)
+      .map((x) => {
+        const rs = x.split(/\s+/);
+        return rs;
+      });
+    return list;
   }
 }
