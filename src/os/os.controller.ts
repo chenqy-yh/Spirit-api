@@ -12,17 +12,17 @@ export class OsController {
   }
   @Get('info')
   async getServerInfo() {
-    const disk_t = this.osService.getServerDiskInfo();
-    const cpu_t = this.osService.getServerCputInfo();
-    const load_t = this.osService.getServerLoadInfo();
-    const mem_t = this.osService.getServerMemInfo();
-    const t_list = await Promise.all([cpu_t, load_t, mem_t, disk_t]);
+    console.log('getServerInfo');
+    const disk_t = await this.osService.getServerDiskInfo();
+    const cpu_t = await this.osService.getServerCpuInfo();
+    const load_t = await this.osService.getServerLoadInfo();
+    const mem_t = await this.osService.getServerMemInfo();
     return {
       timestamp: new Date().getTime(),
-      cpu: t_list[0],
-      load: t_list[1],
-      mem: t_list[2],
-      disk: t_list[3],
+      cpu: cpu_t,
+      load: load_t,
+      mem: mem_t,
+      disk: disk_t,
     };
   }
 }
