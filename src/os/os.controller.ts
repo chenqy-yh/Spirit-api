@@ -17,12 +17,14 @@ export class OsController {
     const cpu_t = await this.osService.getServerCpuInfo();
     const load_t = await this.osService.getServerLoadInfo();
     const mem_t = await this.osService.getServerMemInfo();
+    const network_t = await this.osService.getServerNetwork();
     return {
       timestamp: new Date().getTime(),
       cpu: cpu_t,
       load: load_t,
       mem: mem_t,
       disk: disk_t,
+      network: network_t,
     };
   }
 }

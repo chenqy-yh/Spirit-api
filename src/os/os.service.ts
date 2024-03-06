@@ -68,8 +68,14 @@ export class OsService {
       .splice(2)
       .map((x) => {
         const rs = x.split(/\s+/);
-        return rs;
+        if(!rs[0]) rs.shift();
+        if(!rs.length) return;        
+        return {
+          name: rs[0].slice(0,-1),
+          downT: +rs[1],
+          upT: +rs[9],
+        }
       });
-    return list;
+    return list.filter(x=>x);
   }
 }
