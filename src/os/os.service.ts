@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import * as osu from 'os-utils';
-import * as di from 'diskinfo';
+import * as di from 'node-disk-info';
 import * as si from 'systeminformation';
 import * as fs from 'fs';
 
@@ -10,7 +10,7 @@ import * as fs from 'fs';
 @Injectable()
 export class OsService {
   //cpu info
-  async getServerCputInfo() {
+  async getServerCpuInfo() {
     const t1 = new Promise((res) => {
       osu.cpuUsage((v) => {
         res(v);
@@ -69,13 +69,6 @@ export class OsService {
   // 文件系统：/dev/vda1
   // 类型：ext4，系统占用：2.9G
   async getServerDiskInfo() {
-    return await new Promise((res, rej) => {
-      di.getDrives((err, drives) => {
-        if (err) {
-          rej(err);
-        }
-        res(drives);
-      });
-    });
+    return di.getDiskInfo(); 
   }
 }
