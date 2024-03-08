@@ -12,7 +12,6 @@ export class OsController {
   }
   @Get('info')
   async getServerInfo() {
-    console.log('getServerInfo');
     const disk_t = await this.osService.getServerDiskInfo();
     const cpu_t = await this.osService.getServerCpuInfo();
     const load_t = await this.osService.getServerLoadInfo();
