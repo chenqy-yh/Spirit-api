@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
+import { exec } from 'child_process';
 import * as osu from 'os-utils';
-import * as di from 'node-disk-info';
 import * as si from 'systeminformation';
-import * as fs from 'fs';
 
 @Injectable()
 export class OsService {
@@ -28,61 +27,163 @@ export class OsService {
     };
   }
 
-  async getServerLoadInfo() {
-    const load_info_list = fs
-      .readFileSync('/proc/loadavg', 'utf-8')
-      .split(/\s+/);
-    return {
-      avload_1: load_info_list[0],
-      avload_5: load_info_list[1],
-      avload_15: load_info_list[2],
-      active_total_per: load_info_list[3],
-    };
+  getServerLoadInfo() {
+    return this.execCommand('cat /proc/loadavg', (stdout) => {
+      const lines = stdout.split('\n');
+      const load_info = lines[0].split(/\s+/);
+      return {
+        one: load_info[0],
+        five: load_info[1],
+        fifteen: load_info[2],
+        process: load_info[3],
+        last_pid: load_info[4]
+      }
+    });
   }
 
   async getServerMemInfo() {
-    const mem_info: si.Systeminformation.MemData = await si.mem();
-    return {
-      total: mem_info.total,
-      free: mem_info.free,
-      used: mem_info.used,
-      available: mem_info.available,
-    };
+    return this.execCommand('free -m', (stdout) => {
+      const lines = stdout.split('\n');
+      const memory_info = lines[1].split(/\s+/);
+      return {
+        total: memory_info[1],
+        used: memory_info[2],
+        free: memory_info[3],
+        shared: memory_info[4],
+        buff_cache: memory_info[5],
+        available: memory_info[6]
+      }
+    });
   }
 
-  async getServerDiskInfo() {
-    return di.getDiskInfo();
-  }
+  getServerDiskInfo() {
+    return this.execCommand('df -h', (stdout) => {
+      const lines = stdout.split('\n');
+      // 去掉第一行和最后一行
+      lines.shift(); lines.pop();
+      const drive_info_list = lines.map(line => {
+        const [filesystem,
+          size,
+          used,
+          available,
+          capacity,
+          mountedOn]
+          = line.split(/\s+/);
 
-  // "upTotal": 506490584,
-  // "downTotal": 405200998,
-  // "up": 0.97,
-  // "down": 1.73,
-  // "downPackets": 953271,
-  // "upPackets": 991508,
+        return {
+          filesystem,
+          size,
+          used,
+          available,
+          capacity,
+          mountedOn
+        }
+      });
+      return drive_info_list;
+    });
+  }
 
   getServerNetwork() {
-    const str = fs.readFileSync('/proc/net/dev', 'utf-8');
-    const total = [0, 0];
-    const list = str
-      .split('\n')
-      .splice(2)
-      .map((x) => {
-        const rs = x.split(/\s+/);
-        if (!rs[0]) rs.shift();
-        if (!rs.length) return;
-        total[0] += +rs[1];
-        total[1] += +rs[9];
+    return this.execCommand('ifconfig | grep -v "inet6"', (stdout) => {
+      const lines = stdout.split('\n');
+      const nic_list = lines.reduce((acc, _, i, arr) => {
+        if (!(i % 8)) {
+          acc.push(arr.slice(i, i + 8));
+        }
+        return acc;
+      }, []);
+      nic_list.pop();
+      let downT = 0;
+      let upT = 0;
+      const nic_info_list = nic_list.map(nic => {
+        const rx = {
+          packets: +nic[3].split(/\s+/)[3],
+          bytes: +nic[3].split(/\s+/)[5],
+        }
+        const tx = {
+          packets: +nic[5].split(/\s+/)[3],
+          bytes: +nic[5].split(/\s+/)[5],
+        }
+        downT += rx.bytes;
+        upT += tx.bytes;
         return {
-          name: rs[0].slice(0, -1),
-          downT: +rs[1],
-          upT: +rs[9],
-        };
+          inet: nic[1].split(/\s+/)[2],
+          mask: nic[1].split(/\s+/)[4],
+          RX: rx,
+          TX: tx,
+        }
+      })
+      return {
+        list: nic_info_list,
+        downT,
+        upT,
+      };
+    });
+  }
+
+  // 获取系统信息
+  getServerName() {
+    return this.execCommand('uname -a', (stdout) => {
+      const lines = stdout.split('\n');
+      lines.pop();
+      const info = lines[0].split(/\s+/);
+      return {
+        sname: info[0] + ' ' + info[1]
+      }
+    })
+  }
+
+  getServerBitLen() {
+    return this.execCommand('getconf LONG_BIT', (stdout) => {
+      return {
+        bit: stdout.slice(0, -1)
+      }
+    })
+  }
+
+  getServerProcs() {
+    return this.execCommand('ps -e | wc -l', (stdout) => {
+      return {
+        procs: stdout.slice(0, -1)
+      }
+    })
+  }
+
+  getMemDetail() {
+    return this.execCommand('dmidecode -t 17', (stdout) => {
+      const lines = stdout.split('\n');
+      lines.pop();
+      return {
+        size: lines.find(line => line.includes('Size')).split(/\s+/).reduce((acc, cur, i) => {
+          if (i === 2 || i == 3) {
+            return acc + cur
+          }
+          return acc
+        }),
+        type: lines.find(line => line.includes('Type')).split(/\s+/)[2]
+      }
+    })
+  }
+
+  getDiskDetail() {
+    return this.execCommand('lshw -class disk', (stdout) => {
+      const lines = stdout.split('\n');
+      lines.pop();
+      const info = lines[2].split(/\s+/);
+      return {
+        name: info[2] + lines[3],
+      }
+    })
+  }
+
+
+  execCommand(command: string, callback: (stdout: string) => void) {
+    return new Promise((resolve, reject) => {
+      exec(command, (error, stdout, stderr) => {
+        if (error) return reject(error);
+        if (stderr) return reject(stderr);
+        resolve(callback(stdout));
       });
-    return {
-      list: list.filter((x) => x),
-      downT: total[0],
-      upT: total[1],
-    };
+    });
   }
 }
