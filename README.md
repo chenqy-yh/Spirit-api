@@ -1,5 +1,4 @@
 <h2>关于</h2>
----
 
 Server-monitor Api Server
 
