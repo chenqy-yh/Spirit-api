@@ -1,7 +1,7 @@
 /*
  * @Date: 2024-03-31 12:32:48
  * @LastEditors: Chenqy
- * @LastEditTime: 2024-03-31 15:37:38
+ * @LastEditTime: 2024-04-17 13:03:19
  * @FilePath: /monitor_client/src/file/file.controller.ts
  * @Description: True or False
  */
@@ -18,6 +18,7 @@ export class FileController {
     }
     @Get('list')
     async fileList(@Query('path') path: string, @Query('filter') filter: string) {
+        console.log('controller', path, filter)
         return await this.fileService.fileList(path, filter)
     }
 

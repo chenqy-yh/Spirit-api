@@ -218,6 +218,7 @@ export class FileService {
      * @return {*}
      */
     async fileList(dir_path: string, filter: string = '') {
+        console.log(dir_path, filter)
         return await this.readDir(dir_path, filter)
     }
 
@@ -228,6 +229,7 @@ export class FileService {
      * @return {*}
      */
     readDir(path: string, filter: string): Promise<any[]> {
+        console.log(path, filter)
         return this.execShellCommand(`ls -lA ${path} --time-style=long-iso`).then((stdout: string) => {
             const line = stdout.split('\n').slice(1, -1)
             const allFiles = line.map((l) => {

@@ -1,3 +1,10 @@
+/*
+ * @Date: 2024-04-17 23:54:27
+ * @LastEditors: Chenqy
+ * @LastEditTime: 2024-04-18 00:02:46
+ * @FilePath: /monitor_client/src/log/log.service.ts
+ * @Description: True or False
+ */
 import { Injectable } from '@nestjs/common';
 import * as fs from 'fs'
 import * as readline from 'readline'
@@ -28,8 +35,8 @@ export class LogService {
 
 
     async handleQueryLog(type: string, page: number, size: number) {
-        const start = (page - 1) * size
-        const end = page * size
+        const start = +page * size
+        const end = (+page + 1) * size
         return {
             total: Math.ceil(this.log.get(type).length / size),
             data: this.log.get(type).slice(start, end)
