@@ -153,7 +153,8 @@ export class FileService {
      */
     async delFile(path: string) {
         return new Promise((resolve, reject) => {
-            fs.unlink(path, (err) => {
+            // del file and dir
+            fs.rm(path, { recursive: true }, (err) => {
                 if (err) return reject(new HttpException('file path error', 400))
                 resolve('delete success')
             })
